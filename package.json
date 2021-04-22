@@ -6,10 +6,10 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
+    "prepare": "husky install",
     "lintstaged": "lint-staged",
     "lint:fix": "eslint --fix --ext .js src/",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "husky install"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "Thiago Moura <thmoura14@gmail.com>",
