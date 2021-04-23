@@ -1,5 +1,5 @@
-const appVersion = '/api/v1'
+import 'dotenv/config'
 
 export default {
-  bootcampsUri: `${appVersion}/bootcamps`
+  bootcampsUri: `${process.env.APP_BASEURI}/bootcamps`
 }
