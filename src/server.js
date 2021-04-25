@@ -2,10 +2,12 @@ import 'dotenv/config'
 import cors from 'cors'
 import morgan from 'morgan'
 import express from 'express'
+import mongoose from 'mongoose'
 
 import * as logger from './config/logger'
 import baseUri from './constants/baseUri'
 import environment from './constants/config'
+import dbConnection from './config/database'
 import bootcampRoutes from './routes/bootcamps'
 
 const PORT = process.env.APP_PORT || 5000
@@ -24,17 +26,32 @@ if (process.env.NODE_ENV === environment.development) {
 }
 
 // routes
-app.use(baseUri.bootcampsUri, bootcampRoutes)
+async function initRoutes() {
+  app.use(baseUri.bootcampsUri, bootcampRoutes)
 
-app.get(`${URI}`, (req, res) =>
-  res.status(200).json({ message: 'DevCamper API' })
-)
+  app.get(`${URI}`, (req, res) =>
+    res.status(200).json({ message: 'DevCamper API' })
+  )
+}
 
-app.listen(PORT, () =>
-  logger.log.info(`API has been started... click => ${HOST}:${PORT}${URI}`)
-)
+async function bootstrap() {
+  await dbConnection().catch((error) => {
+    logger.log.error(`MongoDB Could not connect: ${error.message}`)
+    process.exit(1)
+  })
 
-app.on('error', (error) => {
-  logger.log.error(error.message)
-  app.close(() => process.exit(1))
-})
+  await initRoutes().catch(async (error) => {
+    mongoose.connection.close()
+
+    logger.log.info('MongoDB connection was closed...')
+    logger.log.error(`Server failed to start - ${error}`)
+
+    process.exit(1)
+  })
+
+  app.listen(PORT, () =>
+    logger.log.info(`Server has been started... click => ${HOST}:${PORT}${URI}`)
+  )
+}
+
+bootstrap()
