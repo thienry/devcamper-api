@@ -26,35 +26,30 @@ if (process.env.NODE_ENV === environment.development) {
   app.use(morgan(environment.development))
 }
 
-// routes
 async function initRoutes() {
-  app.use(baseUri.bootcasUri, bootcampRoutes)
+  try {
+    app.use(baseUri.bootcampsUri, bootcampRoutes)
 
-  app.get(`${URI}`, (req, res) =>
-    res.status(200).json({ message: 'DevCamper API' })
-  )
-}
-
-async function bootstrap() {
-  await dbConnection().catch((error) => {
-    logger.log.error(
-      chalk.yellow.bgRed.bold(`MongoDB Could not connect: ${error.message}`)
+    app.get(`${URI}`, (req, res) =>
+      res.status(200).json({ message: 'DevCamper API' })
     )
-    process.exit(1)
-  })
-
-  await initRoutes().catch((error) => {
+  } catch (error) {
     mongoose.connection.close()
 
-    logger.log.info(
-      chalk.yellow.bgCyan.bold('MongoDB connection was closed...')
-    )
     logger.log.error(
       chalk.yellow.bgRed.bold(`Server failed to start - ${error}`)
     )
+    logger.log.info(
+      chalk.yellow.bgCyan.bold('MongoDB connection was closed...')
+    )
 
     process.exit(1)
-  })
+  }
+}
+
+async function bootstrap() {
+  await dbConnection()
+  await initRoutes()
 
   app.listen(PORT, () =>
     logger.log.info(

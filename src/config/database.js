@@ -15,9 +15,11 @@ async function dbConnection() {
     logger.log.info(
       chalk.yellow.bgGreen.bold(`MongoDB Connected: ${conn.connection.host}`)
     )
-    return conn
   } catch (error) {
-    throw new Error(error.message)
+    logger.log.error(
+      chalk.yellow.bgRed.bold(`MongoDB Could not connect: ${error.message}`)
+    )
+    process.exit(1)
   }
 }
 
