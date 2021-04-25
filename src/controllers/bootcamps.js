@@ -1,5 +1,7 @@
 /** @namespace BootcampControllers */
 
+import Bootcamp from '../models/Bootcamp'
+
 /**
  * @async
  * @auth          Public
@@ -50,9 +52,19 @@ export function getBootcamp(req, res, next) {
  * @param     {Object} res - The data provided to each handler.
  * @param     {function(Object)} next - The handler to call.
  */
-export function createBootcamp(req, res, next) {
-  res.status(200).json({ message: 'OK' })
-  next()
+export async function createBootcamp(req, res) {
+  try {
+    const bootcamp = await Bootcamp.create(req.body)
+    res.status(201).json({
+      success: true,
+      data: bootcamp
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
 }
 
 /**
