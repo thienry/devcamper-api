@@ -18,7 +18,9 @@ import Bootcamp from '../models/Bootcamp'
 export async function getBootcamps(req, res) {
   try {
     const bootcamps = await Bootcamp.find()
-    res.status(200).json({ success: true, data: bootcamps })
+    res
+      .status(200)
+      .json({ success: true, count: bootcamps.length, data: bootcamps })
   } catch (error) {
     res.status(400).json({ success: false, message: error.message })
   }
@@ -87,9 +89,21 @@ export async function createBootcamp(req, res) {
  * @param     {Object} res - The data provided to each handler.
  * @param     {function(Object)} next - The handler to call.
  */
-export function updateBootcamp(req, res, next) {
-  res.status(200).json({ message: 'OK' })
-  next()
+export async function updateBootcamp(req, res) {
+  try {
+    const bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true
+    })
+
+    if (!bootcamp) {
+      return res.status(400).json({ success: false })
+    }
+
+    res.status(200).json({ success: true, data: bootcamp })
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message })
+  }
 }
 
 /**
@@ -105,7 +119,16 @@ export function updateBootcamp(req, res, next) {
  * @param     {Object} res - The data provided to each handler.
  * @param     {function(Object)} next - The handler to call.
  */
-export function deleteBootcamp(req, res, next) {
-  res.status(200).json({ message: 'OK' })
-  next()
+export async function deleteBootcamp(req, res) {
+  try {
+    const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id)
+
+    if (!bootcamp) {
+      return res.status(400).json({ success: false })
+    }
+
+    res.status(200).json({ success: true })
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message })
+  }
 }
