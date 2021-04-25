@@ -15,9 +15,13 @@ import Bootcamp from '../models/Bootcamp'
  * @param     {Object} res - The data provided to each handler.
  * @param     {function(Object)} next - The handler to call.
  */
-export function getBootcamps(req, res, next) {
-  res.status(200).json({ message: 'OK' })
-  next()
+export async function getBootcamps(req, res) {
+  try {
+    const bootcamps = await Bootcamp.find()
+    res.status(200).json({ success: true, data: bootcamps })
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message })
+  }
 }
 
 /**
@@ -33,9 +37,18 @@ export function getBootcamps(req, res, next) {
  * @param     {Object} res - The data provided to each handler.
  * @param     {function(Object)} next - The handler to call.
  */
-export function getBootcamp(req, res, next) {
-  res.status(200).json({ message: 'OK' })
-  next()
+export async function getBootcamp(req, res) {
+  try {
+    const bootcamp = await Bootcamp.findById(req.params.id)
+
+    if (!bootcamp) {
+      return res.status(400).json({ success: false })
+    }
+
+    res.status(200).json({ success: true, data: bootcamp })
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message })
+  }
 }
 
 /**
@@ -55,15 +68,9 @@ export function getBootcamp(req, res, next) {
 export async function createBootcamp(req, res) {
   try {
     const bootcamp = await Bootcamp.create(req.body)
-    res.status(201).json({
-      success: true,
-      data: bootcamp
-    })
+    res.status(201).json({ success: true, data: bootcamp })
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    })
+    res.status(400).json({ success: false, message: error.message })
   }
 }
 
