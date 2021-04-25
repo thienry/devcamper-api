@@ -1,3 +1,4 @@
+import chalk from 'chalk'
 import mongoose from 'mongoose'
 
 import * as logger from './logger'
@@ -11,7 +12,9 @@ async function dbConnection() {
       useUnifiedTopology: true
     })
 
-    logger.log.info(`MongoDB Connected: ${conn.connection.host}`)
+    logger.log.info(
+      chalk.yellow.bgGreen.bold(`MongoDB Connected: ${conn.connection.host}`)
+    )
     return conn
   } catch (error) {
     throw new Error(error.message)
