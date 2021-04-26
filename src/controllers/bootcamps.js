@@ -1,6 +1,7 @@
 /** @namespace BootcampControllers */
 
 import Bootcamp from '../models/Bootcamp'
+import { ErrorResponse } from '../utils/ErrorResponse'
 
 /**
  * @async
@@ -15,14 +16,14 @@ import Bootcamp from '../models/Bootcamp'
  * @param     {Object} res - The data provided to each handler.
  * @param     {function(Object)} next - The handler to call.
  */
-export async function getBootcamps(req, res) {
+export async function getBootcamps(req, res, next) {
   try {
     const bootcamps = await Bootcamp.find()
     res
       .status(200)
       .json({ success: true, count: bootcamps.length, data: bootcamps })
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message })
+    next(error)
   }
 }
 
@@ -39,17 +40,21 @@ export async function getBootcamps(req, res) {
  * @param     {Object} res - The data provided to each handler.
  * @param     {function(Object)} next - The handler to call.
  */
-export async function getBootcamp(req, res) {
+export async function getBootcamp(req, res, next) {
+  const bootcampId = req.params.id
+
   try {
-    const bootcamp = await Bootcamp.findById(req.params.id)
+    const bootcamp = await Bootcamp.findById(bootcampId)
 
     if (!bootcamp) {
-      return res.status(400).json({ success: false })
+      return next(
+        new ErrorResponse(`Bootcamp not found with id of ${bootcampId}`, 404)
+      )
     }
 
     res.status(200).json({ success: true, data: bootcamp })
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message })
+    next(error)
   }
 }
 
@@ -67,12 +72,12 @@ export async function getBootcamp(req, res) {
  * @param     {Object} res - The data provided to each handler.
  * @param     {function(Object)} next - The handler to call.
  */
-export async function createBootcamp(req, res) {
+export async function createBootcamp(req, res, next) {
   try {
     const bootcamp = await Bootcamp.create(req.body)
     res.status(201).json({ success: true, data: bootcamp })
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message })
+    next(error)
   }
 }
 
@@ -89,7 +94,9 @@ export async function createBootcamp(req, res) {
  * @param     {Object} res - The data provided to each handler.
  * @param     {function(Object)} next - The handler to call.
  */
-export async function updateBootcamp(req, res) {
+export async function updateBootcamp(req, res, next) {
+  const bootcampId = req.params.id
+
   try {
     const bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
@@ -97,12 +104,14 @@ export async function updateBootcamp(req, res) {
     })
 
     if (!bootcamp) {
-      return res.status(400).json({ success: false })
+      return next(
+        new ErrorResponse(`Bootcamp not found with id of ${bootcampId}`, 404)
+      )
     }
 
     res.status(200).json({ success: true, data: bootcamp })
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message })
+    next(error)
   }
 }
 
@@ -119,16 +128,20 @@ export async function updateBootcamp(req, res) {
  * @param     {Object} res - The data provided to each handler.
  * @param     {function(Object)} next - The handler to call.
  */
-export async function deleteBootcamp(req, res) {
+export async function deleteBootcamp(req, res, next) {
+  const bootcampId = req.params.id
+
   try {
     const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id)
 
     if (!bootcamp) {
-      return res.status(400).json({ success: false })
+      return next(
+        new ErrorResponse(`Bootcamp not found with id of ${bootcampId}`, 404)
+      )
     }
 
     res.status(200).json({ success: true })
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message })
+    next(error)
   }
 }

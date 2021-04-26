@@ -10,10 +10,11 @@ import * as logger from './config/logger'
 import environment from './constants/config'
 import dbConnection from './config/database'
 import bootcampRoutes from './routes/bootcamps'
+import errorHandler from './middlewares/errorHandler'
 
 const PORT = process.env.APP_PORT || 5000
-const HOST = process.env.APP_HOSTNAME || 'http://localhost'
 const URI = process.env.APP_BASEURI || '/api/v1'
+const HOST = process.env.APP_HOSTNAME || 'http://localhost'
 
 const app = express()
 
@@ -33,6 +34,8 @@ async function initRoutes() {
     app.get(`${URI}`, (req, res) =>
       res.status(200).json({ message: 'DevCamper API' })
     )
+
+    app.use(errorHandler)
   } catch (error) {
     mongoose.connection.close()
 
