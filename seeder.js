@@ -40,12 +40,5 @@ async function deleteData() {
   }
 }
 
-if (process.argv[4] === '-i') {
-  console.log('Chegou ImportData')
-  importData()
-}
-
-if (process.argv[4] === '-d') {
-  console.log('Chegou DeleteData')
-  deleteData()
-}
+if (process.argv[4] === '-i') importData()
+if (process.argv[4] === '-d') deleteData()
