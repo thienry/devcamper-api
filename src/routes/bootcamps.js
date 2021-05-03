@@ -15,4 +15,9 @@ router
   .put(bootcampController.updateBootcamp)
   .delete(bootcampController.deleteBootcamp)
 
+router.get(
+  '/radius/:zipcode/:distance',
+  bootcampController.getBootcampsInRadius
+)
+
 export default router

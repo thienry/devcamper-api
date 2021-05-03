@@ -1,5 +1,6 @@
 /** @namespace BootcampControllers */
 
+import geocoder from '../utils/geocoder'
 import Bootcamp from '../models/Bootcamp'
 import asyncHandler from '../middlewares/async'
 import { ErrorResponse } from '../utils/ErrorResponse'
@@ -13,8 +14,8 @@ import { ErrorResponse } from '../utils/ErrorResponse'
  * @memberof      BootcampControllers
  
  * @returns   {Promise<void>}
- * @param     {Object} req - The data provided to each handler.
- * @param     {Object} res - The data provided to each handler.
+ * @param     {Object} req - The req object represents the HTTP request and has properties for the request query string, parameters, body, HTTP headers, and so on
+ * @param     {Object} res - The res object represents the HTTP response that an Express app sends when it gets an HTTP request.
  * @param     {function(Object)} next - The handler to call.
  */
 export const getBootcamps = asyncHandler(async (req, res) => {
@@ -33,8 +34,8 @@ export const getBootcamps = asyncHandler(async (req, res) => {
  * @memberof      BootcampControllers
  
  * @returns   {Promise<void>}
- * @param     {Object} req - The data provided to each handler.
- * @param     {Object} res - The data provided to each handler.
+ * @param     {Object} req - The req object represents the HTTP request and has properties for the request query string, parameters, body, HTTP headers, and so on
+ * @param     {Object} res - The res object represents the HTTP response that an Express app sends when it gets an HTTP request.
  * @param     {function(Object)} next - The handler to call.
  */
 export const getBootcamp = asyncHandler(async (req, res, next) => {
@@ -60,8 +61,8 @@ export const getBootcamp = asyncHandler(async (req, res, next) => {
 
  
  * @returns   {Promise<void>}
- * @param     {Object} req - The data provided to each handler.
- * @param     {Object} res - The data provided to each handler.
+ * @param     {Object} req - The req object represents the HTTP request and has properties for the request query string, parameters, body, HTTP headers, and so on
+ * @param     {Object} res - The res object represents the HTTP response that an Express app sends when it gets an HTTP request.
  * @param     {function(Object)} next - The handler to call.
  */
 export const createBootcamp = asyncHandler(async (req, res) => {
@@ -78,8 +79,8 @@ export const createBootcamp = asyncHandler(async (req, res) => {
  * @memberof      BootcampControllers
 
  * @returns   {Promise<void>}
- * @param     {Object} req - The data provided to each handler.
- * @param     {Object} res - The data provided to each handler.
+ * @param     {Object} req - The req object represents the HTTP request and has properties for the request query string, parameters, body, HTTP headers, and so on
+ * @param     {Object} res - The res object represents the HTTP response that an Express app sends when it gets an HTTP request.
  * @param     {function(Object)} next - The handler to call.
  */
 export const updateBootcamp = asyncHandler(async (req, res, next) => {
@@ -107,8 +108,8 @@ export const updateBootcamp = asyncHandler(async (req, res, next) => {
  * @memberof      BootcampControllers
 
  * @returns   {Promise<void>}
- * @param     {Object} req - The data provided to each handler.
- * @param     {Object} res - The data provided to each handler.
+ * @param     {Object} req - The req object represents the HTTP request and has properties for the request query string, parameters, body, HTTP headers, and so on
+ * @param     {Object} res - The res object represents the HTTP response that an Express app sends when it gets an HTTP request.
  * @param     {function(Object)} next - The handler to call.
  */
 export const deleteBootcamp = asyncHandler(async (req, res, next) => {
@@ -122,4 +123,47 @@ export const deleteBootcamp = asyncHandler(async (req, res, next) => {
   }
 
   res.status(200).json({ success: true })
+})
+
+/**
+ * @async
+ * @auth          Private
+ * @route         GET /api/v1/bootcamps/radius/:zipcode/:distance
+ * @author        Thiago Moura <thmoura14@gmail.com>
+ * @description   Get bootcamps within a radius
+ * @memberof      BootcampControllers
+
+ * @returns   {Promise<void>}
+ * @param     {Object} req - The req object represents the HTTP request and has properties for the request query string, parameters, body, HTTP headers, and so on
+ * @param     {Object} res - The res object represents the HTTP response that an Express app sends when it gets an HTTP request.
+ * @param     {function(Object)} next - The handler to call.
+ */
+export const getBootcampsInRadius = asyncHandler(async (req, res, next) => {
+  const { zipcode, distance } = req.params
+
+  const [loc] = await geocoder.geocode(zipcode)
+
+  if (!loc) {
+    return next(
+      new ErrorResponse(`No address found with zipcode ${zipcode} passed`, 404)
+    )
+  }
+
+  const lat = loc.latitude
+  const lng = loc.longitude
+  const radius = distance / 6378
+
+  const query = {
+    location: {
+      $geoWithin: {
+        $centerSphere: [[lng, lat], radius]
+      }
+    }
+  }
+
+  const bootcamps = await Bootcamp.find(query)
+
+  res
+    .status(200)
+    .json({ success: true, count: bootcamps.length, data: bootcamps })
 })
