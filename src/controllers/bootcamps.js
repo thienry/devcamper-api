@@ -19,13 +19,32 @@ import { ErrorResponse } from '../utils/ErrorResponse'
  * @param     {function(Object)} next - The handler to call.
  */
 export const getBootcamps = asyncHandler(async (req, res) => {
-  const queryStr = JSON.stringify(req.query)
-  const query = queryStr.replace(
+  const reqQuery = { ...req.query }
+
+  const removeFields = ['select', 'sort']
+  removeFields.forEach((param) => delete reqQuery[param])
+
+  const queryStr = JSON.stringify(reqQuery)
+  const queryFormatted = queryStr.replace(
     /\b(gt|gte|lt|lte|in)\b/g,
     (match) => `$${match}`
   )
 
-  const bootcamps = await Bootcamp.find(JSON.parse(query))
+  let query = Bootcamp.find(JSON.parse(queryFormatted))
+
+  if (req.query.select) {
+    const fields = req.query.select.split(',').join(' ')
+    query = query.select(fields)
+  }
+
+  if (req.query.sort) {
+    const sortBy = req.query.sort.split(',').join(' ')
+    query = query.sort(sortBy)
+  } else {
+    query = query.sort('-createdAt')
+  }
+
+  const bootcamps = await query
 
   res
     .status(200)
