@@ -19,7 +19,14 @@ import { ErrorResponse } from '../utils/ErrorResponse'
  * @param     {function(Object)} next - The handler to call.
  */
 export const getBootcamps = asyncHandler(async (req, res) => {
-  const bootcamps = await Bootcamp.find()
+  const queryStr = JSON.stringify(req.query)
+  const query = queryStr.replace(
+    /\b(gt|gte|lt|lte|in)\b/g,
+    (match) => `$${match}`
+  )
+
+  const bootcamps = await Bootcamp.find(JSON.parse(query))
+
   res
     .status(200)
     .json({ success: true, count: bootcamps.length, data: bootcamps })
