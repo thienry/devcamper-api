@@ -4,6 +4,7 @@ import { resolve } from 'path'
 import mongoose from 'mongoose'
 import { readFileSync } from 'fs'
 
+import Course from './src/models/Course'
 import Bootcamp from './src/models/Bootcamp'
 import * as logger from './src/config/logger'
 
@@ -20,9 +21,14 @@ const bootcamps = JSON.parse(
   readFileSync(resolve(__dirname, '_data', 'bootcamps.json'), 'utf-8')
 )
 
+const courses = JSON.parse(
+  readFileSync(resolve(__dirname, '_data', 'courses.json'), 'utf-8')
+)
+
 async function importData() {
   try {
     await Bootcamp.create(bootcamps)
+    await Course.create(courses)
     logger.log.info(chalk.yellow.bgGreen.bold('Data Imported...'))
     process.exit()
   } catch (error) {
@@ -33,6 +39,7 @@ async function importData() {
 async function deleteData() {
   try {
     await Bootcamp.deleteMany()
+    await Course.deleteMany()
     logger.log.info(chalk.white.bgRed.bold('Data Destroyed...'))
     process.exit()
   } catch (error) {
