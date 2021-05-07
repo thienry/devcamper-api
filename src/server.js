@@ -7,6 +7,7 @@ import mongoose from 'mongoose'
 
 import baseUri from './constants/baseUri'
 import * as logger from './config/logger'
+import courseRoutes from './routes/courses'
 import environment from './constants/config'
 import dbConnection from './config/database'
 import bootcampRoutes from './routes/bootcamps'
@@ -30,6 +31,7 @@ if (process.env.NODE_ENV === environment.development) {
 async function initRoutes() {
   try {
     app.use(baseUri.bootcampsUri, bootcampRoutes)
+    app.use(baseUri.courseUri, courseRoutes)
 
     app.get(`${URI}`, (req, res) =>
       res.status(200).json({ message: 'DevCamper API' })
