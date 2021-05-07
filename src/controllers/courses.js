@@ -65,7 +65,7 @@ export const getCourse = asyncHandler(async (req, res, next) => {
  * @route         POST /api/v1/bootcamps/:bootcampId/courses
  * @author        Thiago Moura <thmoura14@gmail.com>
  * @description   Create new courses
- * @memberof      BootcampControllers
+ * @memberof      CourseControllers
 
  
  * @returns   {Promise<void>}
@@ -75,6 +75,7 @@ export const getCourse = asyncHandler(async (req, res, next) => {
  */
 export const createCourse = asyncHandler(async (req, res, next) => {
   const { bootcampId } = req.params
+
   req.body.bootcamp = bootcampId
 
   const bootcamp = await Bootcamp.findById(bootcampId).populate({
@@ -92,4 +93,68 @@ export const createCourse = asyncHandler(async (req, res, next) => {
   const course = await Course.create(req.body)
 
   res.status(201).json({ success: true, data: course })
+})
+
+/**
+ * @async
+ * @auth          Private
+ * @route         PUT /api/v1/courses/:id
+ * @author        Thiago Moura <thmoura14@gmail.com>
+ * @description   Update courses
+ * @memberof      CourseControllers
+
+ * @returns   {Promise<void>}
+ * @param     {Object} req - The req object represents the HTTP request and has properties for the request query string, parameters, body, HTTP headers, and so on
+ * @param     {Object} res - The res object represents the HTTP response that an Express app sends when it gets an HTTP request.
+ * @param     {function(Object)} next - The handler to call.
+ */
+export const updateCourse = asyncHandler(async (req, res, next) => {
+  const courseId = req.params.id
+
+  let course = await Course.findByIdAndUpdate(courseId, req.body, {
+    new: true,
+    runValidators: true
+  })
+
+  if (!course) {
+    return next(
+      new ErrorResponse(`No Course was found with id of ${courseId}`, 404)
+    )
+  }
+
+  course = await Course.findByIdAndUpdate(courseId, req.body, {
+    new: true,
+    runValidators: true
+  })
+
+  res.status(200).json({ success: true, data: course })
+})
+
+/**
+ * @async
+ * @auth          Private
+ * @route         DELETE /api/v1/courses/:id
+ * @author        Thiago Moura <thmoura14@gmail.com>
+ * @description   Delete course
+ * @memberof      BootcampControllers
+
+ * @returns   {Promise<void>}
+ * @param     {Object} req - The req object represents the HTTP request and has properties for the request query string, parameters, body, HTTP headers, and so on
+ * @param     {Object} res - The res object represents the HTTP response that an Express app sends when it gets an HTTP request.
+ * @param     {function(Object)} next - The handler to call.
+ */
+export const deleteCourse = asyncHandler(async (req, res, next) => {
+  const courseId = req.params.id
+
+  const course = await Course.findById(courseId)
+
+  if (!course) {
+    return next(
+      new ErrorResponse(`Bootcamp not found with id of ${courseId}`, 404)
+    )
+  }
+
+  await course.remove()
+
+  res.status(200).json({ success: true, data: {} })
 })

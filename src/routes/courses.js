@@ -9,6 +9,10 @@ router
   .get(courseController.getCourses)
   .post(courseController.createBootcamp)
 
-router.route('/:id').get(courseController.getCourse)
+router
+  .route('/:id')
+  .get(courseController.getCourse)
+  .put(courseController.updateCourse)
+  .delete(courseController.deleteCourse)
 
 export default router
