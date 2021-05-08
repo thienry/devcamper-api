@@ -22,13 +22,14 @@ import { ErrorResponse } from '../utils/ErrorResponse'
 export const getCourses = asyncHandler(async (req, res) => {
   const { bootcampId } = req.query
 
-  const query = bootcampId
-    ? Course.find({ bootcamp: bootcampId })
-    : Course.find().populate({ path: 'bootcamp', select: 'name description' })
+  if (bootcampId) {
+    const courses = await Course.find({ bootcamp: bootcampId })
+    return res
+      .status(200)
+      .json({ success: true, count: courses.length, data: courses })
+  }
 
-  const courses = await query
-
-  res.status(200).json({ success: true, count: courses.length, data: courses })
+  res.status(200).json(res.advancedResults)
 })
 
 /**

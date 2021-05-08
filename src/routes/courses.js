@@ -1,12 +1,17 @@
 import { Router } from 'express'
 
+import Course from '../model/course'
 import * as courseController from '../controllers/courses'
+import advancedResults from '../middlewares/advancedResults'
 
 const router = Router({ mergeParams: true })
 
 router
   .route('/')
-  .get(courseController.getCourses)
+  .get(
+    advancedResults(Course, { path: 'bootcamp', select: 'name description' }),
+    courseController.getCourses
+  )
   .post(courseController.createCourse)
 
 router

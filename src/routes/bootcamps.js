@@ -1,6 +1,8 @@
 import { Router } from 'express'
 
 import courseRouter from './courses'
+import Bootcamp from '../models/Bootcamp'
+import advancedResults from '../middlewares/advancedResults'
 import * as bootcampController from '../controllers/bootcamps'
 
 const router = Router()
@@ -9,7 +11,7 @@ router.use('/:bootcampId/courses', courseRouter)
 
 router
   .route('/')
-  .get(bootcampController.getBootcamps)
+  .get(advancedResults(Bootcamp, 'courses'), bootcampController.getBootcamps)
   .post(bootcampController.createBootcamp)
 
 router
