@@ -18,9 +18,10 @@ router
   .put(bootcampController.updateBootcamp)
   .delete(bootcampController.deleteBootcamp)
 
-router.get(
-  '/radius/:zipcode/:distance',
-  bootcampController.getBootcampsInRadius
-)
+router
+  .route('/radius/:zipcode/:distance')
+  .get(bootcampController.getBootcampsInRadius)
+
+router.route(':id/photo').get(bootcampController.bootcampPhotoUpload)
 
 export default router

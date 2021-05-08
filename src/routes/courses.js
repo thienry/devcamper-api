@@ -7,7 +7,7 @@ const router = Router({ mergeParams: true })
 router
   .route('/')
   .get(courseController.getCourses)
-  .post(courseController.createBootcamp)
+  .post(courseController.createCourse)
 
 router
   .route('/:id')

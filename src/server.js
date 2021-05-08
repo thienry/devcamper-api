@@ -1,9 +1,11 @@
 import 'dotenv/config'
 import cors from 'cors'
+import path from 'path'
 import chalk from 'chalk'
 import morgan from 'morgan'
 import express from 'express'
 import mongoose from 'mongoose'
+import fileupload from 'express-fileupload'
 
 import baseUri from './constants/baseUri'
 import * as logger from './config/logger'
@@ -27,6 +29,9 @@ app.use(express.json())
 if (process.env.NODE_ENV === environment.development) {
   app.use(morgan(environment.development))
 }
+
+app.use(fileupload())
+app.use(express.static(path.join(__dirname, 'public')))
 
 async function initRoutes() {
   try {
